@@ -1,4 +1,3 @@
-# Example file showing a circle moving on screen
 import pygame
 
 class body:
@@ -11,6 +10,11 @@ class body:
         self.pos += self.vel * dt
         self.vel += self.acc * dt
 
+class camera:
+    def __init__(self, zoom, pos):
+        self.zoom = zoom # compared to in-game. zoom = 1 means 1:1 correspondence
+        self.pos = pygame.Vector2(pos) # position of the top left corner of the camera in in-game coordinates
+
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
@@ -18,9 +22,11 @@ running = True
 dt = 0
 dtxd = 0.01
 
+camera = camera(5, pygame.Vector2(0, 0))
 
-init_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-ball = body(10, init_pos, pygame.Vector2(10, 10), pygame.Vector2(100, 0))
+
+init_pos = pygame.Vector2(screen.get_width() / 9, screen.get_height() / 9)
+ball = body(10, init_pos, pygame.Vector2(10, 10), pygame.Vector2(0, 0))
 
 while running:
     # poll for events
@@ -32,7 +38,7 @@ while running:
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("purple")
 
-    pygame.draw.circle(screen, "red", ball.pos, 40)
+    pygame.draw.circle(screen, "red", ball.pos * camera.zoom + camera.pos, 40 * camera.zoom)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
@@ -53,4 +59,5 @@ while running:
     dt = clock.tick(60) / 1000
     ball.update_state(dtxd)
 
+    print (screen.get_width(), flush=True)
 pygame.quit()
