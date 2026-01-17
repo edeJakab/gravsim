@@ -2,16 +2,16 @@ import pygame
 
 grav_constant = 6.674e-11
 
-class camera:
+class Camera:
     def __init__(self, zoom, pos):
         self.zoom = zoom # compared to in-game. zoom = 1 means 1:1 correspondence
         self.pos = pygame.Vector2(pos) # position of the top left corner of the camera in in-game coordinates
     def world_to_screen(self, world_pos):
-        return world_pos * camera.zoom + camera.pos
+        return world_pos * self.zoom + self.pos
     def scale(self, rad):
-        return rad * camera.zoom
+        return rad * self.zoom
 
-class body:
+class Body:
     def __init__(self, mass, rad, pos, vel, acc):
         self.mass = mass
         self.rad = rad
@@ -19,8 +19,8 @@ class body:
         self.vel = pygame.Vector2(vel)
         self.acc = pygame.Vector2(acc)
     def update_state(self, dt):
+        self.pos += self.vel * dt + self.acc * dt * dt / 2
         self.vel += self.acc * dt
-        self.pos += self.vel * dt
 
 def wall_collision(body, x_min, x_max, y_min, y_max):
     if body.pos.x - body.rad <= x_min:
@@ -38,21 +38,26 @@ def wall_collision(body, x_min, x_max, y_min, y_max):
 
 def grav_update(body1, body2):
     vec12 = body2.pos - body1.pos
-    body1.acc = (grav_constant * body1.mass * body2.mass / (pygame.Vector2.magnitude(vec12) ** 2) ) * pygame.Vector2.normalize(vec12)
-    body2.acc = (grav_constant * body1.mass * body2.mass / (pygame.Vector2.magnitude(vec12) ** 2) ) * pygame.Vector2.normalize(-vec12)
+    body1.acc = (grav_constant * body2.mass / (pygame.Vector2.magnitude(vec12) ** 2) ) * pygame.Vector2.normalize(vec12)
+    body2.acc = (grav_constant * body1.mass / (pygame.Vector2.magnitude(vec12) ** 2) ) * pygame.Vector2.normalize(-vec12)
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 dt = 0
-dtxd = 0.01
+dtxd = 0.55
 
-camera = camera(1, pygame.Vector2(0, 0))
+cam = Camera(1, pygame.Vector2(0, 0))
 
-init_pos = pygame.Vector2(screen.get_width() / 9, screen.get_height() / 9)
-ball = body(100000000000000, 40, init_pos, pygame.Vector2(0, 0), pygame.Vector2(0, 5000))
-ball2 = body(10, 40, init_pos*2, pygame.Vector2(0, 0), pygame.Vector2(0, 0))
+xi = 600
+yi = 300
+init_pos = pygame.Vector2(xi, yi)
+m1 = 100000000000000
+r = 200
+v = (grav_constant * m1 / r) ** 0.5
+ball = Body(m1, 40, init_pos, pygame.Vector2(0, 0), pygame.Vector2(0, 5000))
+ball2 = Body(10, 40, pygame.Vector2(xi + r, yi + r), pygame.Vector2(-v, 0), pygame.Vector2(0, 0))
 
 while running:
     # poll for events
@@ -73,15 +78,17 @@ while running:
     if keys[pygame.K_d]:
         ball.pos.x += 300 * dt
     
-    # grav_update(ball, ball2)
+    grav_update(ball, ball2)
     ball.update_state(dtxd)
     ball2.update_state(dtxd)
     wall_collision(ball, 0, 1280, 0, 720)
     wall_collision(ball2, 0, 1280, 0, 720)
 
-    pygame.draw.circle(screen, "red", camera.world_to_screen(ball.pos), camera.scale(ball.rad))
-    pygame.draw.circle(screen, "red", camera.world_to_screen(ball2.pos), camera.scale(ball2.rad))
+    pygame.draw.circle(screen, "red", cam.world_to_screen(ball.pos), cam.scale(ball.rad))
+    pygame.draw.circle(screen, "red", cam.world_to_screen(ball2.pos), cam.scale(ball2.rad))
     pygame.display.flip()
+    
+    print(ball2.vel, flush=True)
 
     dt = clock.tick(60) / 1000
 pygame.quit()
