@@ -48,7 +48,7 @@ running = True
 dt = 0
 dtxd = 0.55
 
-cam = Camera(1, pygame.Vector2(0, 0))
+cam = Camera(1, pygame.Vector2(100, 0))
 
 xi = 600
 yi = 300
@@ -57,7 +57,7 @@ m1 = 100000000000000
 r = 200
 v = (grav_constant * m1 / r) ** 0.5
 ball = Body(m1, 40, init_pos, pygame.Vector2(0, 0), pygame.Vector2(0, 5000))
-ball2 = Body(10, 40, pygame.Vector2(xi + r, yi + r), pygame.Vector2(-v, 0), pygame.Vector2(0, 0))
+ball2 = Body(10, 40, pygame.Vector2(xi + r, yi), pygame.Vector2(0, v), pygame.Vector2(0, 0))
 
 while running:
     # poll for events
@@ -70,13 +70,17 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
-        ball.pos.y -= 300 * dt
+        cam.pos.y += 10
     if keys[pygame.K_s]:
-        ball.pos.y += 300 * dt
+        cam.pos.y -= 10
     if keys[pygame.K_a]:
-        ball.pos.x -= 300 * dt
+        cam.pos.x += 10
     if keys[pygame.K_d]:
-        ball.pos.x += 300 * dt
+        cam.pos.x -= 10
+    if keys[pygame.K_r]:
+        cam.zoom *= 1.01
+    if keys[pygame.K_e]:
+        cam.zoom *= 0.99
     
     grav_update(ball, ball2)
     ball.update_state(dtxd)
