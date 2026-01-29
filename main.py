@@ -15,31 +15,30 @@ cam = Camera(1, pygame.Vector2(100, 0))
 
 bodies = []
 
-xi = 600
-yi = 300
-init_pos = pygame.Vector2(xi, yi)
-m1 = 100000000000000
-r = 200
-v = (grav_constant * m1 / r) ** 0.5
-ball = Body(m1, 40, init_pos, pygame.Vector2(0, 0), pygame.Vector2(0, 5000))
-ball2 = Body(10, 40, pygame.Vector2(xi + r, yi), pygame.Vector2(0, v), pygame.Vector2(0, 0))
+add_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,30), (100,80)), text = 'add body', manager=manager)
+clear_bodies = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,140), (100,80)), text = 'clear bodies', manager=manager)
+freeze = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,250), (100,80)), text = 'pause', manager=manager)
 
-add_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350,275), (100,50)), text = 'say hello', manager=manager)
-a21dd_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((650,275), (100,50)), text = 'say hello', manager=manager)
+frozen = False
 
 while running:
-
     dt = clock.tick(60) / 1000
 
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == add_body:
-                print('hello', flush=True)
+                bodies.append(Body(1, 40, pygame.Vector2(300, -300), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                print('hello', len(bodies), flush=True)
+            if event.ui_element == clear_bodies:
+                bodies = []
+            if event.ui_element == freeze:
+                if not frozen:
+                    frozen = True
+                else:
+                    frozen = False
 
         manager.process_events(event)
 
@@ -59,14 +58,13 @@ while running:
     if keys[pygame.K_e]:
         cam.zoom *= 0.99
     
-    grav_update_pair(ball, ball2)
-    ball.update_state(dtxd)
-    ball2.update_state(dtxd)
-    wall_collision(ball, 0, 1280, 0, 720)
-    wall_collision(ball2, 0, 1280, 0, 720)
+    if not frozen:
+        for i in range(len(bodies)):
+            bodies[i].update_state(dtxd)
+            wall_collision(bodies[i], 0, 3280, 0, 1720)
 
-    pygame.draw.circle(screen, "red", cam.world_to_screen(ball.pos), cam.scale(ball.rad))
-    pygame.draw.circle(screen, "red", cam.world_to_screen(ball2.pos), cam.scale(ball2.rad))
+    for i in range(len(bodies)):
+        pygame.draw.circle(screen, "red", cam.world_to_screen(bodies[i].pos), cam.scale(bodies[i].rad))
 
     manager.update(dt)
     manager.draw_ui(screen)
