@@ -1,4 +1,5 @@
 import pygame
+import pygame_gui
 from engine import *
 
 pygame.init()
@@ -7,6 +8,8 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 dtxd = 0.55
+
+manager = pygame_gui.UIManager((1280, 720))
 
 cam = Camera(1, pygame.Vector2(100, 0))
 
@@ -21,12 +24,24 @@ v = (grav_constant * m1 / r) ** 0.5
 ball = Body(m1, 40, init_pos, pygame.Vector2(0, 0), pygame.Vector2(0, 5000))
 ball2 = Body(10, 40, pygame.Vector2(xi + r, yi), pygame.Vector2(0, v), pygame.Vector2(0, 0))
 
+add_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350,275), (100,50)), text = 'say hello', manager=manager)
+a21dd_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((650,275), (100,50)), text = 'say hello', manager=manager)
+
 while running:
+
+    dt = clock.tick(60) / 1000
+
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == add_body:
+                print('hello', flush=True)
+
+        manager.process_events(event)
 
     screen.fill("purple")
 
@@ -52,7 +67,9 @@ while running:
 
     pygame.draw.circle(screen, "red", cam.world_to_screen(ball.pos), cam.scale(ball.rad))
     pygame.draw.circle(screen, "red", cam.world_to_screen(ball2.pos), cam.scale(ball2.rad))
+
+    manager.update(dt)
+    manager.draw_ui(screen)
     pygame.display.flip()
 
-    dt = clock.tick(60) / 1000
 pygame.quit()
