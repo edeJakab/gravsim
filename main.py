@@ -3,13 +3,16 @@ import pygame_gui
 from engine import *
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen_size = (1280, 720)
+screen = pygame.display.set_mode(screen_size)
 clock = pygame.time.Clock()
 running = True
+
 dt = 0
+dt_multiplier = 1
 dtxd = 0.55
 
-manager = pygame_gui.UIManager((1280, 720))
+manager = pygame_gui.UIManager(screen_size)
 
 cam = Camera(1, pygame.Vector2(100, 0))
 
@@ -22,7 +25,8 @@ freeze = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,250), (100,8
 frozen = False
 
 while running:
-    dt = clock.tick(60) / 1000
+    dt = clock.tick(60) / 50
+    dt = dt * dt_multiplier
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -42,7 +46,7 @@ while running:
 
         manager.process_events(event)
 
-    screen.fill("purple")
+    screen.fill("black")
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
@@ -57,14 +61,21 @@ while running:
         cam.zoom *= 1.01
     if keys[pygame.K_e]:
         cam.zoom *= 0.99
+    if keys[pygame.K_v]:
+        dt_multiplier += 0.01
     
+    pygame.draw.rect(screen, "white", pygame.Rect(cam.world_to_screen(pygame.Vector2((0, 0))), cam.scale(pygame.Vector2(screen_size))))
+
     if not frozen:
         for i in range(len(bodies)):
-            bodies[i].update_state(dtxd)
-            wall_collision(bodies[i], 0, 3280, 0, 1720)
+            bodies[i].update_state(dt)
+            wall_collision(bodies[i], 0, screen_size[0], 0, screen_size[1])
+            if pygame.math.Vector2.magnitude(bodies[i].vel) > 130:
+                print(pygame.math.Vector2.magnitude(bodies[i].vel), flush=True)
 
     for i in range(len(bodies)):
         pygame.draw.circle(screen, "red", cam.world_to_screen(bodies[i].pos), cam.scale(bodies[i].rad))
+
 
     manager.update(dt)
     manager.draw_ui(screen)
