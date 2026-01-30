@@ -2,6 +2,8 @@ import pygame
 import pygame_gui
 from engine import *
 
+import random
+
 pygame.init()
 screen_size = (1280, 720)
 screen = pygame.display.set_mode(screen_size)
@@ -34,7 +36,15 @@ while running:
     
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == add_body:
-                bodies.append(Body(1, 40, pygame.Vector2(300, -300), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
                 print('hello', len(bodies), flush=True)
             if event.ui_element == clear_bodies:
                 bodies = []
@@ -64,14 +74,12 @@ while running:
     if keys[pygame.K_v]:
         dt_multiplier += 0.01
     
-    pygame.draw.rect(screen, "white", pygame.Rect(cam.world_to_screen(pygame.Vector2((0, 0))), cam.scale(pygame.Vector2(screen_size))))
+    pygame.draw.rect(screen, "white", pygame.Rect(cam.world_to_screen(pygame.Vector2((0, 0))), cam.scale(pygame.Vector2(screen_size)*10)))
 
     if not frozen:
         for i in range(len(bodies)):
             bodies[i].update_state(dt)
-            wall_collision(bodies[i], 0, screen_size[0], 0, screen_size[1])
-            if pygame.math.Vector2.magnitude(bodies[i].vel) > 130:
-                print(pygame.math.Vector2.magnitude(bodies[i].vel), flush=True)
+            wall_collision(bodies[i], 0, screen_size[0]*10, 0, screen_size[1]*10)
 
     for i in range(len(bodies)):
         pygame.draw.circle(screen, "red", cam.world_to_screen(bodies[i].pos), cam.scale(bodies[i].rad))
