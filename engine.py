@@ -22,6 +22,18 @@ class Body:
         self.pos += self.vel * dt + self.acc * dt * dt / 2
         self.vel += self.acc * dt
 
+bodies = []
+
+def update_gravity(bodies):
+    for body1 in bodies:
+        net_force = pygame.Vector2((0, 0))
+        for body2 in bodies:
+            r12 = body2.pos - body1.pos
+            if r12 != pygame.Vector2((0,0)):
+                net_force += ((grav_constant * body1.mass * body2.mass) / (pygame.Vector2.magnitude(r12) ** 2) ) * pygame.Vector2.normalize(r12)
+        net_acc = net_force / body1.mass
+        body1.acc = net_acc
+
 def wall_collision(body, x_min, x_max, y_min, y_max):
     if body.pos.x - body.rad <= x_min:
         body.pos.x = x_min + body.rad

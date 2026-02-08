@@ -18,13 +18,14 @@ manager = pygame_gui.UIManager(screen_size)
 
 cam = Camera(1, pygame.Vector2(100, 0))
 
-bodies = []
 
 add_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,30), (100,80)), text = 'add body', manager=manager)
 clear_bodies = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,140), (100,80)), text = 'clear bodies', manager=manager)
 freeze = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,250), (100,80)), text = 'pause', manager=manager)
 
 frozen = False
+
+bodies.append(Body(100000000000000000, 500, pygame.Vector2((1000, 1000)), pygame.Vector2((0, 0)), pygame.Vector2((0,0))))
 
 while running:
     dt = clock.tick(60) / 50
@@ -42,7 +43,7 @@ while running:
                 bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
                 bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
                 bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(10000000000000000, 400, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
                 bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
                 bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
                 print('hello', len(bodies), flush=True)
@@ -77,12 +78,14 @@ while running:
     pygame.draw.rect(screen, "white", pygame.Rect(cam.world_to_screen(pygame.Vector2((0, 0))), cam.scale(pygame.Vector2(screen_size)*10)))
 
     if not frozen:
+        update_gravity(bodies)
         for i in range(len(bodies)):
             bodies[i].update_state(dt)
             wall_collision(bodies[i], 0, screen_size[0]*10, 0, screen_size[1]*10)
 
     for i in range(len(bodies)):
         pygame.draw.circle(screen, "red", cam.world_to_screen(bodies[i].pos), cam.scale(bodies[i].rad))
+
 
 
     manager.update(dt)
