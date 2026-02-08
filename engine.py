@@ -29,27 +29,12 @@ def update_gravity(bodies):
         net_force = pygame.Vector2((0, 0))
         for body2 in bodies:
             r12 = body2.pos - body1.pos
-            if r12 != pygame.Vector2((0,0)):
+            if pygame.Vector2.magnitude(r12) > 40:
                 net_force += ((grav_constant * body1.mass * body2.mass) / (pygame.Vector2.magnitude(r12) ** 2) ) * pygame.Vector2.normalize(r12)
         net_acc = net_force / body1.mass
         body1.acc = net_acc
 
-def wall_collision(body, x_min, x_max, y_min, y_max):
-    if body.pos.x - body.rad <= x_min:
-        body.pos.x = x_min + body.rad
-        body.vel.x = -body.vel.x
-    if body.pos.x + body.rad >= x_max:
-        body.pos.x = x_max - body.rad
-        body.vel.x = -body.vel.x
-    if body.pos.y - body.rad <= y_min:
-        body.pos.y = y_min + body.rad
-        body.vel.y = -body.vel.y
-    if body.pos.y + body.rad >= y_max:
-        body.pos.y = y_max - body.rad
-        body.vel.y = -body.vel.y
-
-def grav_update_pair(body1, body2):
-    vec12 = body2.pos - body1.pos
-    body1.acc = (grav_constant * body2.mass / (pygame.Vector2.magnitude(vec12) ** 2) ) * pygame.Vector2.normalize(vec12)
-    body2.acc = (grav_constant * body1.mass / (pygame.Vector2.magnitude(vec12) ** 2) ) * pygame.Vector2.normalize(-vec12)
-
+def update_bodies(bodies, dt):
+    update_gravity(bodies)
+    for body in bodies:
+        body.update_state(dt)

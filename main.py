@@ -12,20 +12,17 @@ running = True
 
 dt = 0
 dt_multiplier = 1
-dtxd = 0.55
 
 manager = pygame_gui.UIManager(screen_size)
 
-cam = Camera(1, pygame.Vector2(100, 0))
-
+cam = Camera(0.1, pygame.Vector2(100, 0))
 
 add_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,30), (100,80)), text = 'add body', manager=manager)
 clear_bodies = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,140), (100,80)), text = 'clear bodies', manager=manager)
 freeze = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,250), (100,80)), text = 'pause', manager=manager)
+distributed = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,360), (100,80)), text = 'distributed', manager=manager)
 
 frozen = False
-
-bodies.append(Body(100000000000000000, 500, pygame.Vector2((1000, 1000)), pygame.Vector2((0, 0)), pygame.Vector2((0,0))))
 
 while running:
     dt = clock.tick(60) / 50
@@ -37,15 +34,7 @@ while running:
     
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == add_body:
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(10000000000000000, 400, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
-                bodies.append(Body(1, 40, pygame.Vector2(random.randint(0, 10000), random.randint(0, 1000)), pygame.Vector2(30, 0), pygame.Vector2(0, 10)))
+                bodies.append(Body(20000000000000000, 400, pygame.Vector2((1000, 3000)), pygame.Vector2(0, 0), pygame.Vector2(0, 0)))
                 print('hello', len(bodies), flush=True)
             if event.ui_element == clear_bodies:
                 bodies = []
@@ -54,10 +43,12 @@ while running:
                     frozen = True
                 else:
                     frozen = False
+            if event.ui_element == distributed:
+                for i in range(100, 2001, 100):
+                    for j in range(100, 1001, 100):
+                        bodies.append(Body(1, 40, pygame.Vector2((i, j)), pygame.Vector2(25, 0), pygame.Vector2(0, 0)))
 
         manager.process_events(event)
-
-    screen.fill("black")
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
@@ -73,20 +64,15 @@ while running:
     if keys[pygame.K_e]:
         cam.zoom *= 0.99
     if keys[pygame.K_v]:
-        dt_multiplier += 0.01
+        dt_multiplier += 0.11
     
-    pygame.draw.rect(screen, "white", pygame.Rect(cam.world_to_screen(pygame.Vector2((0, 0))), cam.scale(pygame.Vector2(screen_size)*10)))
+    screen.fill("white")
 
     if not frozen:
-        update_gravity(bodies)
-        for i in range(len(bodies)):
-            bodies[i].update_state(dt)
-            wall_collision(bodies[i], 0, screen_size[0]*10, 0, screen_size[1]*10)
+        update_bodies(bodies, dt)
 
-    for i in range(len(bodies)):
-        pygame.draw.circle(screen, "red", cam.world_to_screen(bodies[i].pos), cam.scale(bodies[i].rad))
-
-
+    for body in bodies:
+        pygame.draw.circle(screen, "red", cam.world_to_screen(body.pos), cam.scale(body.rad))
 
     manager.update(dt)
     manager.draw_ui(screen)
