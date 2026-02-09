@@ -2,8 +2,6 @@ import pygame
 import pygame_gui
 from engine import *
 
-import random
-
 pygame.init()
 screen_size = (1280, 720)
 screen = pygame.display.set_mode(screen_size)

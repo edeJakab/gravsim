@@ -38,3 +38,4 @@ def update_bodies(bodies, dt):
     update_gravity(bodies)
     for body in bodies:
         body.update_state(dt)
+
