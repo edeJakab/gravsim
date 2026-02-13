@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 from engine import *
+from gui import *
 
 pygame.init()
 screen_size = (1280, 720)
@@ -19,6 +20,8 @@ add_body = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,30), (100,
 clear_bodies = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,140), (100,80)), text = 'clear bodies', manager=manager)
 freeze = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,250), (100,80)), text = 'pause', manager=manager)
 distributed = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,360), (100,80)), text = 'distributed', manager=manager)
+
+buttoney = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,460), (100,80)), text = 'LOL', manager=manager)
 
 frozen = False
 
@@ -45,6 +48,9 @@ while running:
                 for i in range(100, 2001, 100):
                     for j in range(100, 1001, 100):
                         bodies.append(Body(1, 40, pygame.Vector2((i, j)), pygame.Vector2(25, 0), pygame.Vector2(0, 0)))
+        if event.type == pygame_gui.UI_BUTTON_ON_HOVERED:
+            if event.ui_element == buttoney:
+                print("pressed", flush=True)
 
         manager.process_events(event)
 
@@ -71,6 +77,10 @@ while running:
 
     for body in bodies:
         pygame.draw.circle(screen, "red", cam.world_to_screen(body.pos), cam.scale(body.rad))
+    
+    b_buttons = []
+    update_b_buttons(b_buttons, manager, cam)
+    print(len(b_buttons), flush = True)
 
     manager.update(dt)
     manager.draw_ui(screen)
