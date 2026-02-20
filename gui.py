@@ -5,12 +5,20 @@ from engine import *
 
 class body_button:
     def __init__(self, body, manager, cam):
+        self.body = body
         self.pos = cam.world_to_screen(body.pos)
         self.gui = pygame_gui.elements.UIButton(relative_rect=pygame.Rect(self.pos, (15,15)), text = "", manager=manager)
+    def update_gui(self):
+        self.gui.set_relative_position(self.pos)
+    def kill(self):
+        self.gui.kill()
 
-b_buttons = []
+b_buttons = {} 
 
 def update_b_buttons(b_buttons, manager, cam):
     for body in bodies:
-        b_buttons.append(body_button(body, manager, cam))
-        
+        if b_buttons.get(body) == None:
+            b_buttons[body] = body_button(body, manager, cam)
+        else:
+            b_buttons[body].pos = cam.world_to_screen(body.pos)
+            b_buttons[body].update_gui()

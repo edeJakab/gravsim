@@ -23,6 +23,8 @@ distributed = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,360), (
 
 buttoney = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((30,460), (100,80)), text = 'LOL', manager=manager)
 
+b_buttons = {}
+
 frozen = False
 
 while running:
@@ -39,6 +41,12 @@ while running:
                 print('hello', len(bodies), flush=True)
             if event.ui_element == clear_bodies:
                 bodies = []
+                # for b_button in b_buttons.values():
+                    # b_button.gui.kill()
+                for body in bodies:
+                    b_buttons[body].kill()
+                print(len(b_buttons), flush = True)
+                print(len(bodies), flush = True)
             if event.ui_element == freeze:
                 if not frozen:
                     frozen = True
@@ -51,6 +59,7 @@ while running:
         if event.type == pygame_gui.UI_BUTTON_ON_HOVERED:
             if event.ui_element == buttoney:
                 print("pressed", flush=True)
+                b_buttons[bodies[0]].kill()
 
         manager.process_events(event)
 
@@ -78,7 +87,6 @@ while running:
     for body in bodies:
         pygame.draw.circle(screen, "red", cam.world_to_screen(body.pos), cam.scale(body.rad))
     
-    b_buttons = []
     update_b_buttons(b_buttons, manager, cam)
     print(len(b_buttons), flush = True)
 
